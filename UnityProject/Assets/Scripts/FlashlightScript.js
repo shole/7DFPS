@@ -24,14 +24,14 @@ function Start () {
 function TurnOn(){
 	if(!switch_on){
 		switch_on = true;
-		audio.PlayOneShot(sound_turn_on, kSoundVolume * PlayerPrefs.GetFloat("sound_volume", 1.0));
+		GetComponent.<AudioSource>().PlayOneShot(sound_turn_on, kSoundVolume * PlayerPrefs.GetFloat("sound_volume", 1.0));
 	}
 }
 
 function TurnOff(){
 	if(switch_on){
 		switch_on = false;
-		audio.PlayOneShot(sound_turn_off, kSoundVolume * PlayerPrefs.GetFloat("sound_volume", 1.0));
+		GetComponent.<AudioSource>().PlayOneShot(sound_turn_off, kSoundVolume * PlayerPrefs.GetFloat("sound_volume", 1.0));
 	}
 }
 
@@ -50,11 +50,11 @@ function Update () {
 		transform.FindChild("Pointlight").gameObject.GetComponent(Light).enabled = false;
 		transform.FindChild("Spotlight").gameObject.GetComponent(Light).enabled = false;
 	}
-	if(rigidbody){
-		transform.FindChild("Pointlight").light.enabled = true;
-		transform.FindChild("Pointlight").light.intensity = 1.0 + Mathf.Sin(Time.time * 2.0);
-		transform.FindChild("Pointlight").light.range = 1.0;
+	if(GetComponent.<Rigidbody>()){
+		transform.FindChild("Pointlight").GetComponent.<Light>().enabled = true;
+		transform.FindChild("Pointlight").GetComponent.<Light>().intensity = 1.0 + Mathf.Sin(Time.time * 2.0);
+		transform.FindChild("Pointlight").GetComponent.<Light>().range = 1.0;
 	} else {
-		transform.FindChild("Pointlight").light.range = 10.0;
+		transform.FindChild("Pointlight").GetComponent.<Light>().range = 10.0;
 	}
 }

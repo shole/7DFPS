@@ -10,13 +10,13 @@ private var glint_light:Light;
 
 function PlaySoundFromGroup(group : Array, volume : float){
 	var which_shot = Random.Range(0,group.length);
-	audio.PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
+	GetComponent.<AudioSource>().PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
 }
 
 function Start () {
 	old_pos = transform.position;
 	if(transform.FindChild("light_pos")){
-		glint_light = transform.FindChild("light_pos").light;
+		glint_light = transform.FindChild("light_pos").GetComponent.<Light>();
 		glint_light.enabled = false;
 	}
 }
@@ -29,18 +29,18 @@ function CollisionSound() {
 }
 
 function FixedUpdate () {
-	if(rigidbody && !rigidbody.IsSleeping() && collider && collider.enabled){
+	if(GetComponent.<Rigidbody>() && !GetComponent.<Rigidbody>().IsSleeping() && GetComponent.<Collider>() && GetComponent.<Collider>().enabled){
 		life_time += Time.deltaTime;
 		var hit : RaycastHit;
 		if(Physics.Linecast(old_pos, transform.position, hit, 1)){
 			transform.position = hit.point;
-			transform.rigidbody.velocity *= -0.3;
+			transform.GetComponent.<Rigidbody>().velocity *= -0.3;
 		}
 		if(life_time > 2.0){
-			rigidbody.Sleep();
+			GetComponent.<Rigidbody>().Sleep();
 		}
 	}
-	if(rigidbody && rigidbody.IsSleeping() && glint_light){
+	if(GetComponent.<Rigidbody>() && GetComponent.<Rigidbody>().IsSleeping() && glint_light){
 		if(glint_delay == 0.0){
 			glint_delay = Random.Range(1.0,5.0);
 		}

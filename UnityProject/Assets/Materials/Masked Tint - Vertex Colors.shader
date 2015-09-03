@@ -11,6 +11,7 @@ Shader "Example/Custom Vertex Data" {
           float3 customColor;
       };
       void vert (inout appdata_full v, out Input o) {
+      	  UNITY_INITIALIZE_OUTPUT(Input, o);
           o.customColor = abs(v.color);
       }
       sampler2D _MainTex;

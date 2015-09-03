@@ -21,7 +21,7 @@ function RemoveRound() : boolean {
 		return false;
 	}
 	var round_obj = transform.FindChild("round_"+num_rounds);
-	round_obj.renderer.enabled = false;
+	round_obj.GetComponent.<Renderer>().enabled = false;
 	--num_rounds;
 	return true;
 }
@@ -48,7 +48,7 @@ function AddRound() : boolean {
 	PlaySoundFromGroup(sound_add_round, 0.3);
 	++num_rounds;
 	var round_obj = transform.FindChild("round_"+num_rounds);
-	round_obj.renderer.enabled = true;
+	round_obj.GetComponent.<Renderer>().enabled = true;
 	return true;
 }
 
@@ -66,9 +66,9 @@ function Start () {
 		round_pos[i] = round.localPosition;
 		round_rot[i] = round.localRotation;
 		if(i < num_rounds){
-			round.renderer.enabled = true;
+			round.GetComponent.<Renderer>().enabled = true;
 		} else {
-			round.renderer.enabled = false;
+			round.GetComponent.<Renderer>().enabled = false;
 		}
 	}
 }
@@ -76,7 +76,7 @@ function Start () {
 function PlaySoundFromGroup(group : Array, volume : float){
 	if(group.length == 0){return;}
 	var which_shot = Random.Range(0,group.length);
-	audio.PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
+	GetComponent.<AudioSource>().PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
 }
 
 function CollisionSound() {
@@ -87,17 +87,17 @@ function CollisionSound() {
 }
 
 function FixedUpdate () {
-	if(rigidbody && !rigidbody.IsSleeping() && collider && collider.enabled){
+	if(GetComponent.<Rigidbody>() && !GetComponent.<Rigidbody>().IsSleeping() && GetComponent.<Collider>() && GetComponent.<Collider>().enabled){
 		life_time += Time.deltaTime;
 		var hit : RaycastHit;
 		if(Physics.Linecast(old_pos, transform.position, hit, 1)){
 			transform.position = hit.point;
-			transform.rigidbody.velocity *= -0.3;
+			transform.GetComponent.<Rigidbody>().velocity *= -0.3;
 		}
 		if(life_time > 2.0){
-			rigidbody.Sleep();
+			GetComponent.<Rigidbody>().Sleep();
 		}
-	} else if(!rigidbody){
+	} else if(!GetComponent.<Rigidbody>()){
 		life_time = 0.0;
 		collided = false;
 	}

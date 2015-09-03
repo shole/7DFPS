@@ -15,7 +15,7 @@ function WasShot(obj : GameObject, pos : Vector3, vel : Vector3) {
 		light_amount = 0.0;
 		Instantiate(destroy_effect, transform.FindChild("bulb").position, Quaternion.identity);
 	}
-	if(obj && obj.collider && obj.collider.material.name == "glass (Instance)"){
+	if(obj && obj.GetComponent.<Collider>() && obj.GetComponent.<Collider>().material.name == "glass (Instance)"){
 		GameObject.Destroy(obj);
 	}
 }

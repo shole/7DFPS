@@ -266,7 +266,7 @@ function SetDead(new_dead : boolean) {
 
 function PlaySoundFromGroup(group : Array, volume : float){
 	var which_shot = Random.Range(0,group.length);
-	audio.PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
+	GetComponent.<AudioSource>().PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
 }
 
 function AddLooseBullet(spring:boolean) {
@@ -290,7 +290,7 @@ function Start() {
 
 	if(Random.Range(0.0,1.0) < 0.35){
 		held_flashlight = Instantiate(holder.flashlight_object);
-		Destroy(held_flashlight.rigidbody);
+		Destroy(held_flashlight.GetComponent.<Rigidbody>());
 		held_flashlight.GetComponent(FlashlightScript).TurnOn();
 		holder.has_flashlight = true;
 	}
@@ -391,11 +391,11 @@ function ShouldPickUpNearby() : boolean {
 	var nearest_mag_dist = 0.0;
 	var colliders = Physics.OverlapSphere(main_camera.transform.position, 2.0, 1 << 8);
 	for(var collider in colliders){
-		if(magazine_obj && collider.gameObject.name == magazine_obj.name+"(Clone)" && collider.gameObject.rigidbody){
+		if(magazine_obj && collider.gameObject.name == magazine_obj.name+"(Clone)" && collider.gameObject.GetComponent.<Rigidbody>()){
 			if(mag_stage == HandMagStage.EMPTY){
 				return true;
 			}	
-		} else if((collider.gameObject.name == casing_with_bullet.name || collider.gameObject.name == casing_with_bullet.name+"(Clone)") && collider.gameObject.rigidbody){
+		} else if((collider.gameObject.name == casing_with_bullet.name || collider.gameObject.name == casing_with_bullet.name+"(Clone)") && collider.gameObject.GetComponent.<Rigidbody>()){
 			return true;
 		}
 	}
@@ -407,25 +407,25 @@ function HandleGetControl(){
 	var nearest_mag_dist = 0.0;
 	var colliders = Physics.OverlapSphere(main_camera.transform.position, 2.0, 1 << 8);
 	for(var collider in colliders){
-		if(magazine_obj && collider.gameObject.name == magazine_obj.name+"(Clone)" && collider.gameObject.rigidbody){
+		if(magazine_obj && collider.gameObject.name == magazine_obj.name+"(Clone)" && collider.gameObject.GetComponent.<Rigidbody>()){
 			var dist = Vector3.Distance(collider.transform.position, main_camera.transform.position);
 			if(!nearest_mag || dist < nearest_mag_dist){	
 				nearest_mag_dist = dist;
 				nearest_mag = collider.gameObject;
 			}					
-		} else if((collider.gameObject.name == casing_with_bullet.name || collider.gameObject.name == casing_with_bullet.name+"(Clone)") && collider.gameObject.rigidbody){
+		} else if((collider.gameObject.name == casing_with_bullet.name || collider.gameObject.name == casing_with_bullet.name+"(Clone)") && collider.gameObject.GetComponent.<Rigidbody>()){
 			collected_rounds.push(collider.gameObject);			
-			collider.gameObject.rigidbody.useGravity = false;
-			collider.gameObject.rigidbody.WakeUp();
+			collider.gameObject.GetComponent.<Rigidbody>().useGravity = false;
+			collider.gameObject.GetComponent.<Rigidbody>().WakeUp();
 			collider.enabled = false;
-		} else if(collider.gameObject.name == "cassette_tape(Clone)" && collider.gameObject.rigidbody){
+		} else if(collider.gameObject.name == "cassette_tape(Clone)" && collider.gameObject.GetComponent.<Rigidbody>()){
 			collected_rounds.push(collider.gameObject);			
-			collider.gameObject.rigidbody.useGravity = false;
-			collider.gameObject.rigidbody.WakeUp();
+			collider.gameObject.GetComponent.<Rigidbody>().useGravity = false;
+			collider.gameObject.GetComponent.<Rigidbody>().WakeUp();
 			collider.enabled = false;
-		} else if(collider.gameObject.name == "flashlight_object(Clone)" && collider.gameObject.rigidbody && !held_flashlight){
+		} else if(collider.gameObject.name == "flashlight_object(Clone)" && collider.gameObject.GetComponent.<Rigidbody>() && !held_flashlight){
 			held_flashlight = collider.gameObject;
-			Destroy(held_flashlight.rigidbody);
+			Destroy(held_flashlight.GetComponent.<Rigidbody>());
 			held_flashlight.GetComponent(FlashlightScript).TurnOn();
 			holder.has_flashlight = true;
 			flash_ground_pos = held_flashlight.transform.position;
@@ -436,7 +436,7 @@ function HandleGetControl(){
 	}
 	if(nearest_mag && mag_stage == HandMagStage.EMPTY){
 		magazine_instance_in_hand = nearest_mag;
-		Destroy(magazine_instance_in_hand.rigidbody);
+		Destroy(magazine_instance_in_hand.GetComponent.<Rigidbody>());
 		mag_ground_pos = magazine_instance_in_hand.transform.position;
 		mag_ground_rot = magazine_instance_in_hand.transform.rotation;
 		mag_ground_pose_spring.state = 1.0;
@@ -757,8 +757,8 @@ function HandleControls() {
 		if(mag_stage == HandMagStage.HOLD){
 			mag_stage = HandMagStage.EMPTY;
 			magazine_instance_in_hand.AddComponent(Rigidbody);
-			magazine_instance_in_hand.rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-			magazine_instance_in_hand.rigidbody.velocity = character_controller.velocity;
+			magazine_instance_in_hand.GetComponent.<Rigidbody>().interpolation = RigidbodyInterpolation.Interpolate;
+			magazine_instance_in_hand.GetComponent.<Rigidbody>().velocity = character_controller.velocity;
 			magazine_instance_in_hand = null;
 			queue_drop = false;
 		}
@@ -809,7 +809,7 @@ function HandleControls() {
 }
 
 function StartTapePlay() {
-	audio.PlayOneShot(holder.sound_tape_start, 1.0 * PlayerPrefs.GetFloat("voice_volume", 1.0));
+	GetComponent.<AudioSource>().PlayOneShot(holder.sound_tape_start, 1.0 * PlayerPrefs.GetFloat("voice_volume", 1.0));
 	audiosource_tape_background.Play();
 	if(tape_in_progress && start_tape_delay == 0.0){ 
 		audiosource_audio_content.Play();
@@ -828,7 +828,7 @@ function StartTapePlay() {
 }
 
 function StopTapePlay() {
-	audio.PlayOneShot(holder.sound_tape_end, 1.0 * PlayerPrefs.GetFloat("voice_volume", 1.0));
+	GetComponent.<AudioSource>().PlayOneShot(holder.sound_tape_end, 1.0 * PlayerPrefs.GetFloat("voice_volume", 1.0));
 	if(tape_in_progress){
 		audiosource_tape_background.Pause();
 		audiosource_audio_content.Pause();
@@ -1310,7 +1310,7 @@ function UpdateInventoryTransformation() {
 		if(disable_springs){  
 			slot.obj.transform.position = mix(
 				start_pos, 
-				main_camera.transform.position + main_camera.camera.ScreenPointToRay(Vector3(main_camera.camera.pixelWidth * (0.05 + i*0.15), main_camera.camera.pixelHeight * 0.17,0)).direction * 0.3, 
+				main_camera.transform.position + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(main_camera.GetComponent.<Camera>().pixelWidth * (0.05 + i*0.15), main_camera.GetComponent.<Camera>().pixelHeight * 0.17,0)).direction * 0.3, 
 				slot.spring.target_state);
 			scale = 0.3 * slot.spring.target_state + (1.0 - slot.spring.target_state);
 			slot.obj.transform.localScale.x *= scale;
@@ -1323,7 +1323,7 @@ function UpdateInventoryTransformation() {
 		} else {  
 			slot.obj.transform.position = mix(
 				start_pos, 
-				main_camera.transform.position + main_camera.camera.ScreenPointToRay(Vector3(main_camera.camera.pixelWidth * (0.05 + i*0.15), main_camera.camera.pixelHeight * 0.17,0)).direction * 0.3, 
+				main_camera.transform.position + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(main_camera.GetComponent.<Camera>().pixelWidth * (0.05 + i*0.15), main_camera.GetComponent.<Camera>().pixelHeight * 0.17,0)).direction * 0.3, 
 				slot.spring.state);
 			scale = 0.3 * slot.spring.state + (1.0 - slot.spring.state);
 			slot.obj.transform.localScale.x *= scale;
@@ -1356,7 +1356,7 @@ function UpdateLooseBulletDisplay() {
 		var spring : Spring = loose_bullet_spring[i];
 		spring.Update();
 		var bullet : GameObject = loose_bullets[i];
-		bullet.transform.position = main_camera.transform.position + main_camera.camera.ScreenPointToRay(Vector3(0.0, main_camera.camera.pixelHeight,0)).direction * 0.3;
+		bullet.transform.position = main_camera.transform.position + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(0.0, main_camera.GetComponent.<Camera>().pixelHeight,0)).direction * 0.3;
 		bullet.transform.position += main_camera.transform.rotation * Vector3(0.02,-0.01,0);
 		bullet.transform.position += main_camera.transform.rotation * Vector3(0.006 * i,0.0,0);
 		bullet.transform.position += main_camera.transform.rotation * Vector3(-0.03,0.03,0) * (1.0 - show_bullet_spring.state);
@@ -1396,8 +1396,8 @@ function UpdatePickupMagnet() {
 		if(!round){
 			continue;
 		}
-		round.rigidbody.velocity += (attract_pos - round.transform.position) * Time.deltaTime * 20.0;
-		round.rigidbody.velocity *= Mathf.Pow(0.1, Time.deltaTime);;
+		round.GetComponent.<Rigidbody>().velocity += (attract_pos - round.transform.position) * Time.deltaTime * 20.0;
+		round.GetComponent.<Rigidbody>().velocity *= Mathf.Pow(0.1, Time.deltaTime);;
 		//round.rigidbody.position += round.rigidbody.velocity * Time.deltaTime;
 		if(Vector3.Distance(round.transform.position, attract_pos) < 0.5){
 			if(round.gameObject.name == "cassette_tape(Clone)"){

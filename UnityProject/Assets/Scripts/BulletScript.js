@@ -27,7 +27,7 @@ function SetVelocity(vel : Vector3){
 }
 
 function SetHostile(){
-	audio.rolloffMode = AudioRolloffMode.Logarithmic;
+	GetComponent.<AudioSource>().rolloffMode = AudioRolloffMode.Logarithmic;
 	PlaySoundFromGroup(sound_flyby, 0.4);
 	hostile = true;
 }
@@ -55,7 +55,7 @@ static function RandomOrientation() : Quaternion {
 
 function PlaySoundFromGroup(group : Array, volume : float){
 	var which_shot = Random.Range(0,group.length);
-	audio.PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
+	GetComponent.<AudioSource>().PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
 }
 
 function Update () {
@@ -90,8 +90,8 @@ function Update () {
 					}
 				}					
 			}
-			if(hit_transform_obj.rigidbody){
-				hit_transform_obj.rigidbody.AddForceAtPosition(velocity * 0.01, hit.point, ForceMode.Impulse);
+			if(hit_transform_obj.GetComponent.<Rigidbody>()){
+				hit_transform_obj.GetComponent.<Rigidbody>().AddForceAtPosition(velocity * 0.01, hit.point, ForceMode.Impulse);
 			}
 			if(light_script){
 				light_script.WasShot(hit_obj, hit.point, velocity);

@@ -307,10 +307,10 @@ function PullSlideBack() {
 		round_in_chamber.AddComponent(Rigidbody);
 		PlaySoundFromGroup(sound_bullet_eject, kGunMechanicVolume);
 		round_in_chamber.transform.parent = null;
-		round_in_chamber.rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-		round_in_chamber.rigidbody.velocity = velocity;
-		round_in_chamber.rigidbody.velocity += transform.rotation * Vector3(Random.Range(2.0,4.0),Random.Range(1.0,2.0),Random.Range(-1.0,-3.0));
-		round_in_chamber.rigidbody.angularVelocity = Vector3(Random.Range(-40.0,40.0),Random.Range(-40.0,40.0),Random.Range(-40.0,40.0));
+		round_in_chamber.GetComponent.<Rigidbody>().interpolation = RigidbodyInterpolation.Interpolate;
+		round_in_chamber.GetComponent.<Rigidbody>().velocity = velocity;
+		round_in_chamber.GetComponent.<Rigidbody>().velocity += transform.rotation * Vector3(Random.Range(2.0,4.0),Random.Range(1.0,2.0),Random.Range(-1.0,-3.0));
+		round_in_chamber.GetComponent.<Rigidbody>().angularVelocity = Vector3(Random.Range(-40.0,40.0),Random.Range(-40.0,40.0),Random.Range(-40.0,40.0));
 		round_in_chamber = null;
 	}
 	if(!ChamberRoundFromMag() && mag_stage == MagStage.IN){
@@ -347,7 +347,7 @@ function PlaySoundFromGroup(group : Array, volume : float){
 		return;
 	}
 	var which_shot = Random.Range(0,group.length);
-	audio.PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
+	GetComponent.<AudioSource>().PlayOneShot(group[which_shot], volume * PlayerPrefs.GetFloat("sound_volume", 1.0));
 }
 
 
@@ -1042,9 +1042,9 @@ function Update () {
 							var bullet = cylinders[i].object;
 							bullet.AddComponent(Rigidbody);
 							bullet.transform.parent = null;
-							bullet.rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-							bullet.rigidbody.velocity = velocity;
-							bullet.rigidbody.angularVelocity = Vector3(Random.Range(-40.0,40.0),Random.Range(-40.0,40.0),Random.Range(-40.0,40.0));
+							bullet.GetComponent.<Rigidbody>().interpolation = RigidbodyInterpolation.Interpolate;
+							bullet.GetComponent.<Rigidbody>().velocity = velocity;
+							bullet.GetComponent.<Rigidbody>().angularVelocity = Vector3(Random.Range(-40.0,40.0),Random.Range(-40.0,40.0),Random.Range(-40.0,40.0));
 							cylinders[i].object = null;
 							cylinders[i].can_fire = false;
 						}
