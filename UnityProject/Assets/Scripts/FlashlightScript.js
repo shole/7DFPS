@@ -11,13 +11,18 @@ private var battery_life_remaining = max_battery_life;
 private var initial_pointlight_intensity : float;
 private var initial_spotlight_intensity : float;
 
+private var Pointlight : Light;
+private var Spotlight : Light;
+
 function Awake() {
 	switch_on = false;// Random.Range(0.0,1.0) < 0.5;
 }
 
 function Start () {
-	initial_pointlight_intensity = transform.FindChild("Pointlight").gameObject.GetComponent(Light).intensity;
-	initial_spotlight_intensity = transform.FindChild("Spotlight").gameObject.GetComponent(Light).intensity;
+	Pointlight = transform.FindChild("Pointlight").GetComponent.<Light>();
+	Spotlight = transform.FindChild("Spotlight").GetComponent.<Light>();
+	initial_pointlight_intensity = Pointlight.intensity;
+	initial_spotlight_intensity = Spotlight.intensity;
 	battery_life_remaining = Random.Range(max_battery_life*0.2, max_battery_life);
 }
 
@@ -42,19 +47,19 @@ function Update () {
 			battery_life_remaining = 0.0;
 		}
 		var battery_curve_eval = battery_curve.Evaluate(1.0-battery_life_remaining/max_battery_life);
-		transform.FindChild("Pointlight").gameObject.GetComponent(Light).intensity = initial_pointlight_intensity * battery_curve_eval * 8.0;
-		transform.FindChild("Spotlight").gameObject.GetComponent(Light).intensity = initial_spotlight_intensity * battery_curve_eval * 3.0;
-		transform.FindChild("Pointlight").gameObject.GetComponent(Light).enabled = true;
-		transform.FindChild("Spotlight").gameObject.GetComponent(Light).enabled = true;
+		Pointlight.intensity = initial_pointlight_intensity * battery_curve_eval * 8.0;
+		Spotlight.intensity = initial_spotlight_intensity * battery_curve_eval * 3.0;
+		Pointlight.enabled = true;
+		Spotlight.enabled = true;
 	} else {
-		transform.FindChild("Pointlight").gameObject.GetComponent(Light).enabled = false;
-		transform.FindChild("Spotlight").gameObject.GetComponent(Light).enabled = false;
+		Pointlight.enabled = false;
+		Spotlight.enabled = false;
 	}
 	if(GetComponent.<Rigidbody>()){
-		transform.FindChild("Pointlight").GetComponent.<Light>().enabled = true;
-		transform.FindChild("Pointlight").GetComponent.<Light>().intensity = 1.0 + Mathf.Sin(Time.time * 2.0);
-		transform.FindChild("Pointlight").GetComponent.<Light>().range = 1.0;
+		Pointlight.enabled = true;
+		Pointlight.intensity = 1.0 + Mathf.Sin(Time.time * 2.0);
+		Pointlight.range = 1.0;
 	} else {
-		transform.FindChild("Pointlight").GetComponent.<Light>().range = 10.0;
+		Pointlight.range = 10.0;
 	}
 }

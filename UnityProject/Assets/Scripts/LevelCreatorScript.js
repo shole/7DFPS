@@ -17,7 +17,13 @@ function SpawnTile(where:int, challenge:float , player:boolean){
 	if(enemies){
 		for(var child : Transform in enemies){
 			if(Random.Range(0.0,1.0) <= challenge){
-				child_obj = Instantiate(child.gameObject, Vector3(0,0,where*20) + child.localPosition + enemies.localPosition, child.localRotation);
+				var spawner = child.GetComponent(Spawner);
+				if (spawner){
+					child_obj = spawner.Spawn(Vector3(0,0,where*20) + child.localPosition + enemies.localPosition, child.localRotation);
+				}
+				else{
+					child_obj = Instantiate(child.gameObject, Vector3(0,0,where*20) + child.localPosition + enemies.localPosition, child.localRotation);
+				}
 				child_obj.transform.parent = level.transform;
 			}
 		}
@@ -42,7 +48,8 @@ function SpawnTile(where:int, challenge:float , player:boolean){
 			var j=0;
 			for(var child : Transform in players){
 				if(j == save){
-					child_obj = Instantiate(child.gameObject, Vector3(0,0,where*20) + child.localPosition + players.localPosition, child.localRotation);
+					child_obj = child.GetComponent(Spawner).Spawn(Vector3(0,0,where*20) + child.localPosition + players.localPosition, child.localRotation);
+					//child_obj = Instantiate(child.gameObject, Vector3(0,0,where*20) + child.localPosition + players.localPosition, child.localRotation);
 					child_obj.transform.parent = level.transform;
 					child_obj.name = "Player";
 				}
