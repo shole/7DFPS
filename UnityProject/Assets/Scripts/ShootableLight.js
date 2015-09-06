@@ -24,9 +24,16 @@ function WasShot(obj : GameObject, pos : Vector3, vel : Vector3) {
 	if(obj && obj.GetComponent.<Collider>() && obj.GetComponent.<Collider>().material.name == "glass (Instance)"){
 		GameObject.Destroy(obj);
 	}
+	ResetCache();
 }
 
 function Start () {
+	ResetCache();
+	illumProp = Shader.PropertyToID("_Illum");
+}
+
+function ResetCache()
+{
 	lights = gameObject.GetComponentsInChildren.<Light>();
 	renderers = gameObject.GetComponentsInChildren.<MeshRenderer>();
 	rendererIsShade = new boolean[renderers.Length];
@@ -34,7 +41,6 @@ function Start () {
 	{
 		rendererIsShade[i] = renderers[i].gameObject.name == "shade";
 	}
-	illumProp = Shader.PropertyToID("_Illum");
 }
 
 function Update () {
