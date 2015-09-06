@@ -65,6 +65,9 @@ var camera_pivot_state = CameraPivotState.WAIT_DOWN;
 var camera_pivot_delay = 0.0;
 var camera_pivot_angle = 0.0;
 
+private var player : GameObject;
+private var _rigidbody : Rigidbody;
+
 function PlaySoundFromGroup(group : Array, volume : float){
 	if(group.length == 0){
 		return;
@@ -202,10 +205,12 @@ function Start () {
 	
 	initial_pos = transform.position;	
 	target_pos = initial_pos;
+	
+	_rigidbody = GetComponent.<Rigidbody>();
 }
 
 function UpdateStationaryTurret() {
-	if(Vector3.Distance(GameObject.Find("Player").transform.position, transform.position) > kSleepDistance){
+	if(Vector3.Distance(player.transform.position, transform.position) > kSleepDistance){
 		GetTurretLightObject().GetComponent.<Light>().shadows = LightShadows.None;		
 		if(audiosource_motor.isPlaying){
 			audiosource_motor.Stop();
@@ -283,7 +288,6 @@ function UpdateStationaryTurret() {
 		}
 	}
 	var danger = 0.0;
-	var player = GameObject.Find("Player");
 	var dist = Vector3.Distance(player.transform.position, transform.position);
 	if(battery_alive){
 		danger += Mathf.Max(0.0, 1.0 - dist/kMaxRange);
@@ -389,11 +393,11 @@ function UpdateStationaryTurret() {
 }
 
 function UpdateDrone() {
-	if(Vector3.Distance(GameObject.Find("Player").transform.position, transform.position) > kSleepDistance){
+	if(Vector3.Distance(player.transform.position, transform.position) > kSleepDistance){
 		GetDroneLightObject().GetComponent.<Light>().shadows = LightShadows.None;
 		if(motor_alive){
 			distance_sleep = true;
-			GetComponent.<Rigidbody>().Sleep();
+			_rigidbody.Sleep();
 		}
 		if(audiosource_motor.isPlaying){
 			audiosource_motor.Stop();
@@ -406,7 +410,7 @@ function UpdateDrone() {
 			GetDroneLightObject().GetComponent.<Light>().shadows = LightShadows.None;
 		}
 		if(motor_alive && distance_sleep){
-			GetComponent.<Rigidbody>().WakeUp();
+			_rigidbody.WakeUp();
 			distance_sleep = false;
 		}
 		if(!audiosource_motor.isPlaying){
@@ -423,7 +427,7 @@ function UpdateDrone() {
 			target_vel = target_vel.normalized;
 		}
 		target_vel *= kFlySpeed;
-		var target_accel = (target_vel - GetComponent.<Rigidbody>().velocity);
+		var target_accel = (target_vel - _rigidbody.velocity);
 		if(ai_state == AIState.IDLE){
 			target_accel *= 0.1;
 		}
@@ -439,7 +443,7 @@ function UpdateDrone() {
 		var correction_angle : float;
 		correction.ToAngleAxis(correction_angle, correction_vec);
 		tilt_correction = correction_vec * correction_angle;
-		tilt_correction -= GetComponent.<Rigidbody>().angularVelocity;
+		tilt_correction -= _rigidbody.angularVelocity;
 		
 		
 		var x_axis = transform.rotation * Vector3(1,0,0);
@@ -464,7 +468,7 @@ function UpdateDrone() {
 			tilt_correction *= 0.1;
 		}
 		
-		if(GetComponent.<Rigidbody>().velocity.magnitude < 0.2){ 
+		if(_rigidbody.velocity.magnitude < 0.2){ 
 			stuck_delay += Time.deltaTime;
 			if(stuck_delay > 1.0){
 				target_pos = transform.position + Vector3(Random.Range(-1.0,1.0), Random.Range(-1.0,1.0), Random.Range(-1.0,1.0));
@@ -476,7 +480,7 @@ function UpdateDrone() {
 		
 	} else {
 		rotor_speed = Mathf.Max(0.0, rotor_speed - Time.deltaTime * 5.0);
-		GetComponent.<Rigidbody>().angularDrag = 0.05;
+		_rigidbody.angularDrag = 0.05;
 	}
 	if(barrel_alive && ai_state == AIState.FIRING){
 		if(!audiosource_taser.isPlaying){
@@ -488,8 +492,8 @@ function UpdateDrone() {
 		if(gun_delay <= 0.0){
 			gun_delay = 0.1;	
 			Instantiate(muzzle_flash, transform.FindChild("point_spark").position, RandomOrientation());
-			if(Vector3.Distance(transform.FindChild("point_spark").position, GameObject.Find("Player").transform.position) < 1){;
-				GameObject.Find("Player").GetComponent(AimScript).Shock();
+			if(Vector3.Distance(transform.FindChild("point_spark").position, player.transform.position) < 1){;
+				player.GetComponent(AimScript).Shock();
 			}
 		}
 	} else {
@@ -550,7 +554,6 @@ function UpdateDrone() {
 		}
 		var cam_pivot = transform.FindChild("camera_pivot");
 		cam_pivot.localEulerAngles.x = camera_pivot_angle;
-		var player = GameObject.Find("Player");
 		var dist = Vector3.Distance(player.transform.position, transform.position);
 		var danger = Mathf.Max(0.0, 1.0 - dist/kMaxRange);
 		if(danger > 0.0){
@@ -668,6 +671,10 @@ function UpdateDrone() {
 
 
 function Update () {
+	if (player == null)
+	{
+		player = GameObject.Find("Player");
+	}
 	switch(robot_type){
 		case RobotType.STATIONARY_TURRET:
 			UpdateStationaryTurret();
@@ -700,9 +707,9 @@ function OnCollisionEnter(collision : Collision) {
 
 function FixedUpdate() {
 	if(robot_type == RobotType.SHOCK_DRONE && !distance_sleep){
-		GetComponent.<Rigidbody>().AddForce(transform.rotation * Vector3(0,1,0) * rotor_speed, ForceMode.Force);
+		_rigidbody.AddForce(transform.rotation * Vector3(0,1,0) * rotor_speed, ForceMode.Force);
 		if(motor_alive){
-			GetComponent.<Rigidbody>().AddTorque(tilt_correction, ForceMode.Force);
+			_rigidbody.AddTorque(tilt_correction, ForceMode.Force);
 		}
 	}
 }
