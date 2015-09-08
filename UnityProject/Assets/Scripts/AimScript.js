@@ -60,7 +60,7 @@ public class Spring {
 		this.vel = 0.0;		
 	}
 	public function Update() {
-#if 0 //[DA] this was active, for some reason, turret behavior was really weird as were some other things
+#if false //[DA] this was active, for some reason, turret behavior was really weird as were some other things
 			this.state = Mathf.MoveTowards(this.state, this.target_state, this.strength * Time.deltaTime * 0.05);		
 #else
 			this.vel += (this.target_state - this.state) * this.strength * Time.deltaTime;
