@@ -24,7 +24,6 @@ function WasShot(obj : GameObject, pos : Vector3, vel : Vector3) {
 	if(obj && obj.GetComponent.<Collider>() && obj.GetComponent.<Collider>().material.name == "glass (Instance)"){
 		GameObject.Destroy(obj);
 	}
-	ResetCache();
 }
 
 function Start () {
@@ -65,14 +64,27 @@ function Update () {
 
 	var combined_color = Color(light_color.r * light_amount,light_color.g * light_amount,light_color.b * light_amount);
 	var i = 0;
+	var cacheDirty = false;
 	for (; i < lights.Length; ++i)
 	{
+		if (lights[i] == null){
+			cacheDirty = true;
+			continue;
+		}
 		lights[i].color = combined_color;
 	}
 	for (i = 0; i < renderers.Length; ++i)
 	{
+		if (renderers[i] == null){
+			cacheDirty = true;
+			continue;
+		}
 		var renderer = renderers[i];
 		var mat = renderer.material;
 		mat.SetColor(illumProp, combined_color * (rendererIsShade[i] ? 0.5f : 1f));
+	}
+	if (cacheDirty)
+	{
+		ResetCache();
 	}
 }
