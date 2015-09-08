@@ -59,15 +59,14 @@ public class Spring {
 		this.damping = damping;
 		this.vel = 0.0;		
 	}
-	public function Update() {  
-		var linear_springs = true;
-		if(linear_springs){
-			this.state = Mathf.MoveTowards(this.state, this.target_state, this.strength * Time.deltaTime * 0.05);
-		} else {	 
+	public function Update() {
+#if 0 //[DA] this was active, for some reason, turret behavior was really weird as were some other things
+			this.state = Mathf.MoveTowards(this.state, this.target_state, this.strength * Time.deltaTime * 0.05);		
+#else
 			this.vel += (this.target_state - this.state) * this.strength * Time.deltaTime;
 			this.vel *= Mathf.Pow(this.damping, Time.deltaTime);
 			this.state += this.vel * Time.deltaTime;
-		}
+#endif
 	}
 };
 
@@ -1445,8 +1444,8 @@ function Update() {
 	UpdatePickupMagnet();
 }
 
-function FixedUpdate() {
-}
+//function FixedUpdate() {
+//}
 
 class DisplayLine {
 	var str : String;
