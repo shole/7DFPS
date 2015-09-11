@@ -13,12 +13,14 @@ private var initial_spotlight_intensity : float;
 
 private var Pointlight : Light;
 private var Spotlight : Light;
+private var _rigidbody : Rigidbody;
 
 function Awake() {
 	switch_on = false;// Random.Range(0.0,1.0) < 0.5;
 }
 
 function Start () {
+	_rigidbody = GetComponent.<Rigidbody>();
 	Pointlight = transform.FindChild("Pointlight").GetComponent.<Light>();
 	Spotlight = transform.FindChild("Spotlight").GetComponent.<Light>();
 	initial_pointlight_intensity = Pointlight.intensity;
@@ -28,6 +30,11 @@ function Start () {
 
 function TurnOn(){
 	if(!switch_on){
+		if (_rigidbody)
+		{
+			Destroy(_rigidbody);
+			_rigidbody = null;
+		}
 		switch_on = true;
 		GetComponent.<AudioSource>().PlayOneShot(sound_turn_on, kSoundVolume * PlayerPrefs.GetFloat("sound_volume", 1.0));
 	}
@@ -55,7 +62,7 @@ function Update () {
 		Pointlight.enabled = false;
 		Spotlight.enabled = false;
 	}
-	if(GetComponent.<Rigidbody>()){
+	if(_rigidbody){
 		Pointlight.enabled = true;
 		Pointlight.intensity = 1.0 + Mathf.Sin(Time.time * 2.0);
 		Pointlight.range = 1.0;

@@ -289,7 +289,6 @@ function Start() {
 
 	if(Random.Range(0.0,1.0) < 0.35){
 		held_flashlight = Instantiate(holder.flashlight_object);
-		Destroy(held_flashlight.GetComponent.<Rigidbody>());
 		held_flashlight.GetComponent(FlashlightScript).TurnOn();
 		holder.has_flashlight = true;
 	}
@@ -424,7 +423,6 @@ function HandleGetControl(){
 			collider.enabled = false;
 		} else if(collider.gameObject.name == "flashlight_object(Clone)" && collider.gameObject.GetComponent.<Rigidbody>() && !held_flashlight){
 			held_flashlight = collider.gameObject;
-			Destroy(held_flashlight.GetComponent.<Rigidbody>());
 			held_flashlight.GetComponent(FlashlightScript).TurnOn();
 			holder.has_flashlight = true;
 			flash_ground_pos = held_flashlight.transform.position;
@@ -1447,15 +1445,6 @@ function Update() {
 //function FixedUpdate() {
 //}
 
-class DisplayLine {
-	var str : String;
-	var bold : boolean;
-	function DisplayLine(_str : String, _bold : boolean){
-		bold = _bold;
-		str = _str;
-	}
-};
-
 function ShouldHolsterGun() : boolean {
 	if(!loose_bullets){
 		return;
@@ -1530,7 +1519,18 @@ function GetFlashlightSlot() : int {
 	return flashlight_slot;
 }
 
-function OnGUI() {
+class DisplayLine {
+	var str : String;
+	var bold : boolean;
+	function DisplayLine(_str : String, _bold : boolean){
+		bold = _bold;
+		str = _str;
+	}
+};
+
+//[DA] TODO: remove as many allocations as possible from here, or simply skip this whole thing in VR mode
+
+function OnGUI_() {
 	var display_text = new Array();
 	var gun_script : GunScript = null;
 	if(gun_instance){

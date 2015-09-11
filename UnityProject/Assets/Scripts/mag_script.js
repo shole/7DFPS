@@ -16,6 +16,9 @@ var mag_load_stage = MagLoadStage.NONE;
 var mag_load_progress = 0.0;
 var disable_interp = true;
 
+private var _rigidbody : Rigidbody;
+private var _collider : Collider;
+
 function RemoveRound() : boolean {
 	if(num_rounds == 0){
 		return false;
@@ -71,6 +74,8 @@ function Start () {
 			round.GetComponent.<Renderer>().enabled = false;
 		}
 	}
+	_rigidbody = GetComponent.<Rigidbody>();
+	_collider = GetComponent.<Collider>();
 }
 
 function PlaySoundFromGroup(group : Array, volume : float){
@@ -87,17 +92,20 @@ function CollisionSound() {
 }
 
 function FixedUpdate () {
-	if(GetComponent.<Rigidbody>() && !GetComponent.<Rigidbody>().IsSleeping() && GetComponent.<Collider>() && GetComponent.<Collider>().enabled){
-		life_time += Time.deltaTime;
-		var hit : RaycastHit;
-		if(Physics.Linecast(old_pos, transform.position, hit, 1)){
-			transform.position = hit.point;
-			transform.GetComponent.<Rigidbody>().velocity *= -0.3;
+	if (_rigidbody)
+	{
+		if(!_rigidbody.IsSleeping() && _collider && _collider.enabled){
+			life_time += Time.fixedDeltaTime;
+			var hit : RaycastHit;
+			if(Physics.Linecast(old_pos, transform.position, hit, 1)){
+				transform.position = hit.point;
+				_rigidbody.velocity *= -0.3;
+			}
+			if(life_time > 2.0){
+				_rigidbody.Sleep();
+			}
 		}
-		if(life_time > 2.0){
-			GetComponent.<Rigidbody>().Sleep();
-		}
-	} else if(!GetComponent.<Rigidbody>()){
+	} else {
 		life_time = 0.0;
 		collided = false;
 	}
