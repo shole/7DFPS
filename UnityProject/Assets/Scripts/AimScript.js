@@ -733,6 +733,12 @@ function HandleGunControls(insert_mag_with_number_key : boolean) {
 }
 
 function HandleControls() {
+	if (Input.GetButton("Reset Tracking"))
+	{
+		VR.InputTracking.Recenter();
+		//OVRManager.display.RecenterPose();
+	}
+
 	if(Input.GetButton("Get")){
 		HandleGetControl();
 	}
@@ -1106,12 +1112,12 @@ function UpdateCameraRotationControls() {
 		rotation_y = Mathf.Clamp (rotation_y, min_angle_y, max_angle_y);
 	
 		if((Input.GetButton("Hold To Aim") || aim_toggle) && gun_instance){
-			view_rotation_y = Mathf.Clamp(view_rotation_y, rotation_y - rotation_y_min_leeway, rotation_y + rotation_y_max_leeway);
+			//view_rotation_y = Mathf.Clamp(view_rotation_y, rotation_y - rotation_y_min_leeway, rotation_y + rotation_y_max_leeway);
 			view_rotation_x = Mathf.Clamp(view_rotation_x, rotation_x - rotation_x_leeway, rotation_x + rotation_x_leeway);
 		} else {
 			view_rotation_x += Input.GetAxis("Mouse X") * sensitivity_x;
-			view_rotation_y += Input.GetAxis("Mouse Y") * sensitivity_y;
-			view_rotation_y = Mathf.Clamp (view_rotation_y, min_angle_y, max_angle_y);
+			//view_rotation_y += Input.GetAxis("Mouse Y") * sensitivity_y;
+			//view_rotation_y = Mathf.Clamp (view_rotation_y, min_angle_y, max_angle_y);
 			
 			rotation_y = Mathf.Clamp(rotation_y, view_rotation_y - rotation_y_max_leeway, view_rotation_y + rotation_y_min_leeway);
 			rotation_x = Mathf.Clamp(rotation_x, view_rotation_x - rotation_x_leeway, view_rotation_x + rotation_x_leeway);
@@ -1126,7 +1132,7 @@ function UpdateCameraAndPlayerTransformation() {
 	}
 	character_controller.transform.localEulerAngles.y = view_rotation_x;
 	main_camera.transform.position = transform.position;
-	main_camera.transform.position.y += character_controller.height * character_controller.transform.localScale.y - 0.1;
+	main_camera.transform.position.y += character_controller.height *.5 * character_controller.transform.localScale.y - 0.1;
 	main_camera.transform.position.y += head_fall;
 }
 
@@ -1307,7 +1313,7 @@ function UpdateInventoryTransformation() {
 		if(disable_springs){  
 			slot.obj.transform.position = mix(
 				start_pos, 
-				main_camera.transform.position + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(main_camera.GetComponent.<Camera>().pixelWidth * (0.05 + i*0.15), main_camera.GetComponent.<Camera>().pixelHeight * 0.17,0)).direction * 0.3, 
+				main_camera.transform.position/* + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(main_camera.GetComponent.<Camera>().pixelWidth * (0.05 + i*0.15), main_camera.GetComponent.<Camera>().pixelHeight * 0.17,0)).direction * 0.3*/, 
 				slot.spring.target_state);
 			scale = 0.3 * slot.spring.target_state + (1.0 - slot.spring.target_state);
 			slot.obj.transform.localScale.x *= scale;
@@ -1320,7 +1326,7 @@ function UpdateInventoryTransformation() {
 		} else {  
 			slot.obj.transform.position = mix(
 				start_pos, 
-				main_camera.transform.position + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(main_camera.GetComponent.<Camera>().pixelWidth * (0.05 + i*0.15), main_camera.GetComponent.<Camera>().pixelHeight * 0.17,0)).direction * 0.3, 
+				main_camera.transform.position/* + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(main_camera.GetComponent.<Camera>().pixelWidth * (0.05 + i*0.15), main_camera.GetComponent.<Camera>().pixelHeight * 0.17,0)).direction * 0.3*/, 
 				slot.spring.state);
 			scale = 0.3 * slot.spring.state + (1.0 - slot.spring.state);
 			slot.obj.transform.localScale.x *= scale;
@@ -1353,7 +1359,7 @@ function UpdateLooseBulletDisplay() {
 		var spring : Spring = loose_bullet_spring[i];
 		spring.Update();
 		var bullet : GameObject = loose_bullets[i];
-		bullet.transform.position = main_camera.transform.position + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(0.0, main_camera.GetComponent.<Camera>().pixelHeight,0)).direction * 0.3;
+		bullet.transform.position = main_camera.transform.position/* + main_camera.GetComponent.<Camera>().ScreenPointToRay(Vector3(0.0, main_camera.GetComponent.<Camera>().pixelHeight,0)).direction * 0.3*/;
 		bullet.transform.position += main_camera.transform.rotation * Vector3(0.02,-0.01,0);
 		bullet.transform.position += main_camera.transform.rotation * Vector3(0.006 * i,0.0,0);
 		bullet.transform.position += main_camera.transform.rotation * Vector3(-0.03,0.03,0) * (1.0 - show_bullet_spring.state);
@@ -1361,10 +1367,11 @@ function UpdateLooseBulletDisplay() {
 		bullet.transform.localScale.y = spring.state;
 		bullet.transform.localScale.z = spring.state;
 		bullet.transform.rotation = main_camera.transform.rotation * Quaternion.AngleAxis(90, Vector3(-1,0,0));
-		var renderers = bullet.GetComponentsInChildren(Renderer);
+		//[DA] needs optimization
+		/*var renderers = bullet.GetComponentsInChildren(Renderer);
 		for(var renderer : Renderer in renderers){
 			renderer.castShadows = false; 
-		}
+		}*/
 	}
 }
 
