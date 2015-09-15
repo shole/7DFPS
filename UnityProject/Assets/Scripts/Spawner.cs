@@ -1,9 +1,11 @@
-﻿#pragma strict
+﻿using UnityEngine;
+using System.Collections;
 
-var target : GameObject;
+public class Spawner : MonoBehaviour {
+	public GameObject target;
 
-public function Spawn(pos : Vector3, rot : Quaternion) : GameObject{
-	var tr = transform;
-	var instance = Instantiate(target, pos, rot);
-	return instance;
+	public GameObject Spawn ( Vector3 pos ,   Quaternion rot  ) {
+		var instance = Instantiate(target, pos, rot) as GameObject;
+		return instance;
+	}
 }

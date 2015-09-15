@@ -1,12 +1,9 @@
-#pragma strict
+using UnityEngine;
+using System.Collections;
 
-var gun_object : GameObject;
-var mag_object : GameObject;
-var bullet_object : GameObject;
-var casing_object : GameObject;
-
-function Start () {
-}
-
-function Update () {
+public class WeaponHolder : MonoBehaviour {
+	public GameObject gun_object;
+	public GameObject mag_object;
+	public GameObject bullet_object;
+	public GameObject casing_object;
 }

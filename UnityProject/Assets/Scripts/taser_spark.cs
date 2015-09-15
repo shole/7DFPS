@@ -1,32 +1,35 @@
-#pragma strict
+using UnityEngine;
+using System.Collections;
 
-var opac = 0.0;
+public class taser_spark : MonoBehaviour {
+	public float opac = 0.0f;
 
-function UpdateColor() {
-	var renderers = transform.GetComponentsInChildren(MeshRenderer);
-	var color = Vector4(opac,opac,opac,opac);
-	for(var renderer : MeshRenderer in renderers){
-		renderer.material.SetColor("_TintColor", color);
+	void  UpdateColor (){
+		var renderers= transform.GetComponentsInChildren<MeshRenderer>();
+		var color= new Vector4(opac,opac,opac,opac);
+		foreach(MeshRenderer renderer in renderers){
+			renderer.material.SetColor("_TintColor", color);
+		}
+		var lights= transform.GetComponentsInChildren<Light>();
+		foreach(Light light in lights){
+			light.intensity = opac * 2.0f;
+		}
 	}
-	var lights = transform.GetComponentsInChildren(Light);
-	for(var light : Light in lights){
-		light.intensity = opac * 2.0;
+
+	void  Start (){
+		opac = Random.Range(0.4f,1.0f);
+		UpdateColor();
+		var localEuler = transform.localEulerAngles;
+		localEuler.z = Random.Range (0.0f, 360.0f);
+		transform.localEulerAngles = localEuler;
+		transform.localScale = new Vector3(Random.Range(0.8f,2.0f), Random.Range(0.8f,2.0f), Random.Range(0.8f,2.0f));
 	}
-}
 
-function Start () {
-	opac = Random.Range(0.4,1.0);
-	UpdateColor();
-	transform.localRotation.eulerAngles.z = Random.Range(0.0,360.0);
-	transform.localScale.x = Random.Range(0.8,2.0);
-	transform.localScale.y = Random.Range(0.8,2.0);
-	transform.localScale.z = Random.Range(0.8,2.0);
-}
-
-function Update() {
-	UpdateColor();
-	opac -= Time.deltaTime * 50.0;
-	if(opac <= 0.0){
-		Destroy(gameObject);
+	void  Update (){
+		UpdateColor();
+		opac -= Time.deltaTime * 50.0f;
+		if(opac <= 0.0f){
+			Destroy(gameObject);
+		}
 	}
 }
