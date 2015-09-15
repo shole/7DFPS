@@ -19,7 +19,18 @@ public class FPSInputController : MonoBehaviour {
 	// Update is called once per frame
 	void  Update (){
 		// Get the input vector from kayboard or analog stick
-		var directionVector= new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        Vector3 directionVector;
+        var leftHand = SixenseInput.GetController(SixenseHands.LEFT);
+        bool hydraJump = false;
+        if (leftHand != null && leftHand.Enabled)
+        {
+            directionVector = new Vector3(leftHand.JoystickX, 0, leftHand.JoystickY);
+            hydraJump = leftHand.GetButton(SixenseButtons.BUMPER);
+        }
+        else
+        {
+            directionVector = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        }
 		
 		if(old_vert_axis < 0.9f && Input.GetAxis("Vertical") >= 0.9f){
 			if(forward_input_delay < 0.4f && !GetComponent<AimScript>().IsAiming()){
@@ -57,6 +68,6 @@ public class FPSInputController : MonoBehaviour {
 		
 		// Apply the direction to the CharacterMotor
 		motor.inputMoveDirection = transform.rotation * directionVector;
-		motor.inputJump = Input.GetButton("Jump");	
+		motor.inputJump = Input.GetButton("Jump") || hydraJump;	
 	}
 }

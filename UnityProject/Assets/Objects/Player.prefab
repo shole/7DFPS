@@ -286,12 +286,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 34a2c5c3fa0f21e42babe4f515868a17, type: 3}
   - {fileID: 8300000, guid: b229a781225b3ba4cbf956d746d20874, type: 3}
   running: 0
-  height_spring:
-    state: 0
-    target_state: 0
-    vel: 0
-    strength: 100
-    damping: 9.99999975e-06
   die_dir: {x: 0, y: 0, z: 0}
   canControl: 1
   useFixedUpdate: 1
@@ -393,7 +387,7 @@ CharacterController:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Height: 1.82000005
+  m_Height: 1.70000005
   m_Radius: .200000003
   m_SlopeLimit: 60
   m_StepOffset: .400000006
@@ -409,7 +403,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 0}
       propertyPath: m_Height
-      value: 1.82000005
+      value: 1.70000005
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

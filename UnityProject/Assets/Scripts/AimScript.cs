@@ -99,6 +99,10 @@ public class AimScript : MonoBehaviour {
 	private float view_rotation_x= 0.0f;
 	private float view_rotation_y= 0.0f;
 
+    private float hydraRefYaw = 0.0f;
+    private Vector3 hydraRefPosition;
+    private const float kHydraToWorldScale = 0.001f;
+
 	private const float kRecoilSpringStrength= 800.0f;
 	private const float kRecoilSpringDamping= 0.000001f;
 	private Spring x_recoil_spring= new Spring(0,0,kRecoilSpringStrength,kRecoilSpringDamping);
@@ -163,7 +167,7 @@ public class AimScript : MonoBehaviour {
 	private bool tape_in_progress= false;
 	private int unplayed_tapes= 0;
 
-	private bool god_mode= false;
+	private bool god_mode= true;
 	private bool slomo_mode= false;
 	private int iddqd_progress= 0;
 	private int idkfa_progress= 0;
@@ -595,8 +599,10 @@ public class AimScript : MonoBehaviour {
 	}
 
 	void  HandleGunControls ( bool insert_mag_with_number_key  ){
-		 var gun_script= GetGunScript();
-		if(Input.GetButton("Trigger")){
+        var rightHand = SixenseInput.GetController(SixenseHands.RIGHT);
+        bool canUseRight = rightHand != null && rightHand.Enabled;
+		var gun_script= GetGunScript();
+		if(Input.GetButton("Trigger") || (canUseRight && rightHand.Trigger > 0.5)){
 			gun_script.ApplyPressureToTrigger();
 		} else {
 			gun_script.ReleasePressureFromTrigger();
@@ -615,20 +621,25 @@ public class AimScript : MonoBehaviour {
 		}	
 		if(Input.GetButtonDown("Auto Mod Toggle")){
 			gun_script.ToggleAutoMod();			
-		}	
-		if(Input.GetButtonDown("Pull Back Slide")){
+		}
+        if (Input.GetButtonDown("Pull Back Slide") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.BUMPER)))
+        {
 			gun_script.PullBackSlide();
 		}
-		if(Input.GetButtonUp("Pull Back Slide")){
+        if (Input.GetButtonUp("Pull Back Slide") || (canUseRight && rightHand.GetButtonUp(SixenseButtons.BUMPER)))
+        {
 			gun_script.ReleaseSlide();
-		}	
-		if(Input.GetButtonDown("Swing Out Cylinder")){
+		}
+        if (Input.GetButtonDown("Swing Out Cylinder") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.ONE)))
+        {
 			gun_script.SwingOutCylinder();
-		}	
-		if(Input.GetButtonDown("Close Cylinder")){
+		}
+        if (Input.GetButtonDown("Close Cylinder") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.TWO)))
+        {
 			gun_script.CloseCylinder();
-		}	
-		if(Input.GetButton("Extractor Rod")){
+		}
+        if (Input.GetButton("Extractor Rod") || (canUseRight && rightHand.GetButton(SixenseButtons.ONE)))
+        {
 			gun_script.ExtractorRod();
 		}
 		if(Input.GetButton("Hammer")){
@@ -639,8 +650,9 @@ public class AimScript : MonoBehaviour {
 		}		
 		if(Input.GetAxis("Mouse ScrollWheel") != 0){
 			gun_script.RotateCylinder((int)Input.GetAxis("Mouse ScrollWheel"));
-		}		
-		if(Input.GetButtonDown("Insert")){
+		}
+        if (Input.GetButtonDown("Insert") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.THREE)))
+        {
 			if(loose_bullets.Count > 0){
 				if(GetGunScript().AddRoundToCylinder()){
 					var loose_bullet = loose_bullets[loose_bullets.Count-1];
@@ -720,7 +732,8 @@ public class AimScript : MonoBehaviour {
 			hold_pose_spring.vel = 0.0f;
 			hold_pose_spring.target_state = 1.0f;
 		}
-		if((Input.GetButtonDown("Insert")/* && aim_spring.state > 0.5f*/) || insert_mag_with_number_key){
+        if ((Input.GetButtonDown("Insert")/* && aim_spring.state > 0.5f*/) || insert_mag_with_number_key || (canUseRight && rightHand.GetButtonDown(SixenseButtons.THREE)))
+        {
 			if(mag_stage == HandMagStage.HOLD && !gun_script.IsThereAMagInGun() || insert_mag_with_number_key){
 				hold_pose_spring.target_state = 0.0f;
 				mag_stage = HandMagStage.HOLD_TO_INSERT;
@@ -736,13 +749,20 @@ public class AimScript : MonoBehaviour {
 	}
 
 	void  HandleControls (){
-		if (Input.GetButton("Reset Tracking"))
+        var rightHand = SixenseInput.GetController(SixenseHands.RIGHT);
+        bool canUseRight = rightHand != null && rightHand.Enabled;
+
+        if (Input.GetButton("Reset Tracking") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.START)))
 		{
 			UnityEngine.VR.InputTracking.Recenter();
+            if (canUseRight)
+            {
+                hydraRefPosition = rightHand.Position * kHydraToWorldScale;
+            }
 			//OVRManager.display.RecenterPose();
 		}
 
-		if(Input.GetButton("Get")){
+		if(Input.GetButton("Get") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.TWO))){
 			HandleGetControl();
 		}
 		
@@ -759,7 +779,7 @@ public class AimScript : MonoBehaviour {
 		
 		var insert_mag_with_number_key= HandleInventoryControls();
 		
-		if(Input.GetButtonDown("Eject/Drop") || queue_drop){
+		if(Input.GetButtonDown("Eject/Drop") || queue_drop || (canUseRight && rightHand.GetButtonDown(SixenseButtons.ONE))){
 			if(mag_stage == HandMagStage.HOLD){
 				mag_stage = HandMagStage.EMPTY;
 				magazine_instance_in_hand.AddComponent<Rigidbody>();
@@ -769,8 +789,9 @@ public class AimScript : MonoBehaviour {
 				queue_drop = false;
 			}
 		}
-		
-		if(Input.GetButtonDown("Eject/Drop")){
+
+        if (Input.GetButtonDown("Eject/Drop") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.ONE)))
+        {
 			if(mag_stage == HandMagStage.EMPTY && gun_instance){
 				if(gun_instance.GetComponent<GunScript>().IsMagCurrentlyEjecting()){
 					queue_drop = true;
@@ -786,17 +807,17 @@ public class AimScript : MonoBehaviour {
 		if(gun_instance){
 			HandleGunControls(insert_mag_with_number_key);
 		} else if(mag_stage == HandMagStage.HOLD){
-			if(Input.GetButtonDown("Insert")){
+            if (Input.GetButtonDown("Insert") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.THREE)))
+            {
 				if(loose_bullets.Count > 0){
 					if(magazine_instance_in_hand.GetComponent<mag_script>().AddRound()){
-						var loose_bullet = loose_bullets[loose_bullets.Count-1];
-						loose_bullets.RemoveAt(loose_bullets.Count-1);
-						GameObject.Destroy(loose_bullet);
-						loose_bullet_spring.RemoveAt(loose_bullet_spring.Count-1);
+						GameObject.Destroy(loose_bullets.pop());
+						loose_bullet_spring.pop();
 					}
 				}
 			}
-			if(Input.GetButtonDown("Pull Back Slide")){
+            if (Input.GetButtonDown("Pull Back Slide") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.BUMPER)))
+            {
 				if(magazine_instance_in_hand.GetComponent<mag_script>().RemoveRoundAnimated()){
 					AddLooseBullet(true);
 					PlaySoundFromGroup(sound_bullet_grab, 0.2f);
@@ -1092,6 +1113,21 @@ public class AimScript : MonoBehaviour {
 	}
 
 	void  UpdateCameraRotationControls (){
+        var leftHand = SixenseInput.GetController(SixenseHands.LEFT);
+        if (leftHand != null && leftHand.Enabled)
+        {
+            if (leftHand.GetButtonDown(SixenseButtons.TRIGGER))
+            {
+                hydraRefYaw = -leftHand.Rotation.eulerAngles.y - view_rotation_x;
+            }
+            else if (leftHand.GetButton(SixenseButtons.TRIGGER))
+            {
+                view_rotation_x = -leftHand.Rotation.eulerAngles.y - hydraRefYaw;
+            }
+            return;
+        }
+
+
 		rotation_y_min_leeway = Mathf.Lerp(0.0f,kRotationYMinLeeway,aim_spring.state);
 		rotation_y_max_leeway = Mathf.Lerp(0.0f,kRotationYMaxLeeway,aim_spring.state);
 		rotation_x_leeway = Mathf.Lerp(0.0f,kRotationXLeeway,aim_spring.state);
@@ -1109,10 +1145,10 @@ public class AimScript : MonoBehaviour {
 		} else {
 			sensitivity_y = Mathf.Abs(sensitivity_y);
 		}
-		
+        var yaw = Input.GetAxis("Mouse X") * sensitivity_x;
 		var in_menu= GameObject.Find("gui_skin_holder").GetComponent<optionsmenuscript>().IsMenuShown();
 		if(!dead && !in_menu){
-			rotation_x += Input.GetAxis("Mouse X") * sensitivity_x;
+			rotation_x += yaw;
 			rotation_y += Input.GetAxis("Mouse Y") * sensitivity_y;
 			rotation_y = Mathf.Clamp (rotation_y, min_angle_y, max_angle_y);
 		
@@ -1120,7 +1156,7 @@ public class AimScript : MonoBehaviour {
 				//view_rotation_y = Mathf.Clamp(view_rotation_y, rotation_y - rotation_y_min_leeway, rotation_y + rotation_y_max_leeway);
 				view_rotation_x = Mathf.Clamp(view_rotation_x, rotation_x - rotation_x_leeway, rotation_x + rotation_x_leeway);
 			} else {
-				view_rotation_x += Input.GetAxis("Mouse X") * sensitivity_x;
+				view_rotation_x += yaw;
 				//view_rotation_y += Input.GetAxis("Mouse Y") * sensitivity_y;
 				//view_rotation_y = Mathf.Clamp (view_rotation_y, min_angle_y, max_angle_y);
 				
@@ -1145,19 +1181,33 @@ public class AimScript : MonoBehaviour {
 	}
 
 	void  UpdateGunTransformation (){
-		var aim_dir= AimDir();
-		var aim_pos= AimPos();	
-		
-		var unaimed_dir= (transform.forward + new Vector3(0,-1,0)).normalized;
-		var unaimed_pos= main_camera.transform.position + unaimed_dir*GunDist();
-		 
-		if(disable_springs){ 
-			gun_instance.transform.position = mix(unaimed_pos, aim_pos, aim_spring.target_state);
-			gun_instance.transform.forward = mix(unaimed_dir, aim_dir, aim_spring.target_state);
-		} else { 
-			gun_instance.transform.position = mix(unaimed_pos, aim_pos, aim_spring.state);
-			gun_instance.transform.forward = mix(unaimed_dir, aim_dir, aim_spring.state);
-		}
+        var rightHand = SixenseInput.GetController(SixenseHands.RIGHT);
+        bool canUseRight = rightHand != null && rightHand.Enabled;
+
+        if (canUseRight)
+        {
+            gun_instance.transform.position = main_camera.transform.TransformPoint((rightHand.Position * kHydraToWorldScale) - hydraRefPosition + new Vector3(0,-0.3f,0));
+            gun_instance.transform.rotation = main_camera.transform.rotation * rightHand.Rotation;
+        }
+        else
+        {
+            var aim_dir = AimDir();
+            var aim_pos = AimPos();
+
+            var unaimed_dir = (transform.forward + new Vector3(0, -1, 0)).normalized;
+            var unaimed_pos = main_camera.transform.position + unaimed_dir * GunDist();
+
+            if (disable_springs)
+            {
+                gun_instance.transform.position = mix(unaimed_pos, aim_pos, aim_spring.target_state);
+                gun_instance.transform.forward = mix(unaimed_dir, aim_dir, aim_spring.target_state);
+            }
+            else
+            {
+                gun_instance.transform.position = mix(unaimed_pos, aim_pos, aim_spring.state);
+                gun_instance.transform.forward = mix(unaimed_dir, aim_dir, aim_spring.state);
+            }
+        }
 		
 		if(disable_springs) {
 			ApplyPose("pose_slide_pull", slide_pose_spring.target_state);

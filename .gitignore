@@ -7,3 +7,4 @@ UnityProject/Library/*
 *.csproj
 *.sln
 *.unityproj
+UnityProject/Assets/UnityVS*

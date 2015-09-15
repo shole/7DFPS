@@ -396,8 +396,10 @@ public class CharacterMotor : MonoBehaviour {
 	}
 
 	void  Update (){
-		if(PlayerPrefs.GetInt("toggle_crouch", 1)==1){
-			if(!GetComponent<AimScript>().IsDead() && Input.GetButtonDown("Crouch Toggle")){
+        var leftHand = SixenseInput.GetController(SixenseHands.LEFT);
+        var canUseLeft = leftHand != null && leftHand.Enabled;
+		if(PlayerPrefs.GetInt("toggle_crouch", 1)==1 || canUseLeft){
+			if(!GetComponent<AimScript>().IsDead() && (Input.GetButtonDown("Crouch Toggle") || (canUseLeft && leftHand.GetButtonDown(SixenseButtons.JOYSTICK)))){
 				crouching = !crouching;
 			}
 		} else {
