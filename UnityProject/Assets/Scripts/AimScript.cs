@@ -167,7 +167,7 @@ public class AimScript : MonoBehaviour {
 	private bool tape_in_progress= false;
 	private int unplayed_tapes= 0;
 
-	private bool god_mode= true;
+	private bool god_mode= false;
 	private bool slomo_mode= false;
 	private int iddqd_progress= 0;
 	private int idkfa_progress= 0;
@@ -304,10 +304,11 @@ public class AimScript : MonoBehaviour {
 		rotation_x = transform.rotation.eulerAngles.y;
 		view_rotation_x = transform.rotation.eulerAngles.y;
 		gun_instance = Instantiate(gun_obj);
-		var renderers= gun_instance.GetComponentsInChildren<Renderer>();
-		foreach(Renderer renderer in renderers){
-			renderer.shadowCastingMode = ShadowCastingMode.Off; 
-		}
+        var renderers = gun_instance.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            renderer.shadowCastingMode = ShadowCastingMode.On;
+        }
 		main_camera = GameObject.Find("Main Camera").gameObject;
 		character_controller = GetComponent<CharacterController>();
 		for(var i=0; i<kMaxHeadRecoil; ++i){
@@ -316,7 +317,7 @@ public class AimScript : MonoBehaviour {
 		for(var i=0; i<10; ++i){
 			weapon_slots[i] = new WeaponSlot();
 		}
-		var num_start_bullets= Random.Range(0,10);
+        var num_start_bullets = 30;// Random.Range(0, 10);
 		if(GetGunScript().gun_type == GunType.AUTOMATIC){
 			var num_start_mags= Random.Range(0,3);
 			for(var i=1; i<num_start_mags+1; ++i){
@@ -450,8 +451,10 @@ public class AimScript : MonoBehaviour {
 		}
 	}
 
-	bool HandleInventoryControls (){	
-		 if(Input.GetButtonDown("Holster")){
+	bool HandleInventoryControls (){
+        var leftHand = SixenseInput.GetController(SixenseHands.LEFT);
+        var canUseLeft = leftHand != null && leftHand.Enabled;
+		 if(Input.GetButtonDown("Holster") || canUseLeft && leftHand.GetButtonDown(SixenseButtons.TWO)){
 			target_weapon_slot = -1;
 		}
 		if(Input.GetButtonDown("Inventory 1")){
@@ -616,10 +619,12 @@ public class AimScript : MonoBehaviour {
 		if(Input.GetButton("Slide Lock")){
 			gun_script.PressureOnSlideLock();
 		}
-		if(Input.GetButtonDown("Safety")){
+        if (Input.GetButtonDown("Safety") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.FOUR)))
+        {
 			gun_script.ToggleSafety();			
-		}	
-		if(Input.GetButtonDown("Auto Mod Toggle")){
+		}
+        if (Input.GetButtonDown("Auto Mod Toggle") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.FOUR)))
+        {
 			gun_script.ToggleAutoMod();			
 		}
         if (Input.GetButtonDown("Pull Back Slide") || (canUseRight && rightHand.GetButtonDown(SixenseButtons.BUMPER)))
@@ -1118,11 +1123,11 @@ public class AimScript : MonoBehaviour {
         {
             if (leftHand.GetButtonDown(SixenseButtons.TRIGGER))
             {
-                hydraRefYaw = -leftHand.Rotation.eulerAngles.y - view_rotation_x;
+                hydraRefYaw = leftHand.Rotation.eulerAngles.y - view_rotation_x;
             }
             else if (leftHand.GetButton(SixenseButtons.TRIGGER))
             {
-                view_rotation_x = -leftHand.Rotation.eulerAngles.y - hydraRefYaw;
+                view_rotation_x = leftHand.Rotation.eulerAngles.y - hydraRefYaw;
             }
             return;
         }

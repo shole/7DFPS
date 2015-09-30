@@ -3,7 +3,8 @@ using System.Collections;
 
 public class mag_script : MonoBehaviour {
 	private int num_rounds= 8;
-	private const int kMaxRounds= 8;
+    [UnityEngine.Serialization.FormerlySerializedAs("kMaxRounds")]
+	public int max_rounds= 8;
 	private Vector3[] round_pos;
 	private Quaternion[] round_rot;
 	private Vector3 old_pos;
@@ -41,11 +42,11 @@ public class mag_script : MonoBehaviour {
 	}
 
 	public bool IsFull (){
-		 return num_rounds == kMaxRounds;
+		 return num_rounds == max_rounds;
 	}
 
 	public bool AddRound (){
-		 if(num_rounds >= kMaxRounds || mag_load_stage != MagLoadStage.NONE){
+		 if(num_rounds >= max_rounds || mag_load_stage != MagLoadStage.NONE){
 			return false;
 		}
 		mag_load_stage = MagLoadStage.PUSHING_DOWN;
@@ -63,10 +64,10 @@ public class mag_script : MonoBehaviour {
 
 	void  Start (){
 		old_pos = transform.position;
-		num_rounds = Random.Range(0,kMaxRounds);
-		round_pos = new Vector3[kMaxRounds];
-		round_rot = new Quaternion[kMaxRounds];
-		for(var i=0; i<kMaxRounds; ++i){
+		num_rounds = Random.Range(0,max_rounds);
+		round_pos = new Vector3[max_rounds];
+		round_rot = new Quaternion[max_rounds];
+		for(var i=0; i<max_rounds; ++i){
 			var round= transform.FindChild("round_"+(i+1));
 			round_pos[i] = round.localPosition;
 			round_rot[i] = round.localRotation;

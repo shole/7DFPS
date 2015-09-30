@@ -16,7 +16,7 @@ public class GUISkinHolder : MonoBehaviour {
 	public bool has_flashlight= false;
 
 	void  Awake (){
-		//weapon = weapons[2];
-		weapon = weapons[Random.Range(0,weapons.Length)];
+	    weapon = weapons[2];
+		//weapon = weapons[Random.Range(0,weapons.Length)];
 	}
 }
