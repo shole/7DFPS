@@ -67,10 +67,11 @@ public class MusicScript : MonoBehaviour {
 	void  Update (){ 
 		danger = Mathf.Max(danger_level_accumulate, danger);
 		danger_level_accumulate = 0.0f;
+        var music_vol = PlayerPrefs.GetFloat("music_volume", 1.0f);
 		for(var i=0; i<music_layers.Length; ++i){
-			music_sources[i].volume = music_volume[i] * PlayerPrefs.GetFloat("music_volume");
+            music_sources[i].volume = music_volume[i] * music_vol;
 		}
-		sting_source.volume = PlayerPrefs.GetFloat("music_volume", 1.0f);
+        sting_source.volume = music_vol;
 	}
 
 	void  FixedUpdate (){

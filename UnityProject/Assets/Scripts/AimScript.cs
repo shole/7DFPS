@@ -1244,6 +1244,16 @@ public class AimScript : MonoBehaviour {
 	}
 
 	void  UpdateFlashlightTransformation (){
+        var leftHand = SixenseInput.GetController(SixenseHands.LEFT);
+        bool canUseLeft = leftHand != null && leftHand.Enabled;
+
+        if (canUseLeft)
+        {
+            held_flashlight.transform.position = main_camera.transform.TransformPoint((leftHand.Position * kHydraToWorldScale) - hydraRefPosition + new Vector3(0, -0.3f, 0));
+            held_flashlight.transform.rotation = main_camera.transform.rotation * leftHand.Rotation;
+            return;
+        }
+
 		var flashlight_hold_pos= main_camera.transform.position + main_camera.transform.rotation*new Vector3(-0.15f,-0.01f,0.15f);
 		var flashlight_hold_rot= main_camera.transform.rotation;
 		
@@ -1251,7 +1261,7 @@ public class AimScript : MonoBehaviour {
 		var flashlight_rot= flashlight_hold_rot;
 
 		held_flashlight.transform.position = flashlight_pos;
-		held_flashlight.transform.rotation = flashlight_rot;
+        held_flashlight.transform.rotation = flashlight_rot;
 
 		held_flashlight.transform.RotateAround(
 			held_flashlight.transform.FindChild("point_recoil_rotate").position,
