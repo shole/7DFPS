@@ -6,6 +6,7 @@ Properties {
 	_MainTex ("Base (RGB) TransGloss (A)", 2D) = "white" {}
 	_DissolveTex ("Dissolve Mask", 2D) = "white" {}
 	_DissolveOrigin("Dissolve Origin", Vector) = (0,0,0,0)
+	_DissolveNormal("Dissolve Normal", Vector) = (0,1,0,0)
 }
 
 SubShader {
@@ -19,7 +20,8 @@ sampler2D _MainTex;
 sampler2D _DissolveTex;
 fixed4 _Color;
 half _Shininess;
-float4 _DissolveOrigin;
+float3 _DissolveOrigin;
+float3 _DissolveNormal;
 
 struct Input {
 	float2 uv_MainTex;
@@ -30,8 +32,8 @@ struct Input {
 
 void surf (Input IN, inout SurfaceOutput o) {
 	fixed4 tex = tex2D(_MainTex, IN.uv_MainTex);
-	float3 fromDissolveOrigin = IN.worldPos-_DissolveOrigin.xyz;
-	float dissolveFactor = 2-dot(fromDissolveOrigin, fromDissolveOrigin)*100;
+	float3 fromDissolveOrigin = IN.worldPos-_DissolveOrigin;
+	float dissolveFactor = 1-dot(fromDissolveOrigin, _DissolveNormal)*20;
 	float3 pos = IN.worldPos*30;
 	fixed dissolve = tex2D(_DissolveTex, pos.xz).a*abs(IN.worldNormal.y) + tex2D(_DissolveTex, pos.xy).a*abs(IN.worldNormal.z) + tex2D(_DissolveTex, pos.yz).a*abs(IN.worldNormal.x);
 	o.Albedo = tex.rgb * _Color.rgb;
