@@ -659,12 +659,12 @@ public class RobotScript : MonoBehaviour {
 		audiosource_motor.pitch = Mathf.Lerp(audiosource_motor.pitch, target_pitch, Mathf.Pow(0.0001f, Time.deltaTime));
 		audiosource_motor.volume = rotor_speed * 0.1f * PlayerPrefs.GetFloat("sound_volume", 1.0f);
 
-		audiosource_motor.volume -= Vector3.Distance(GameObject.Find("Main Camera").transform.position, transform.position) * 0.0125f * PlayerPrefs.GetFloat("sound_volume", 1.0f);
+		audiosource_motor.volume -= Vector3.Distance(GameObject.Find("Camera (head)").transform.position, transform.position) * 0.0125f * PlayerPrefs.GetFloat("sound_volume", 1.0f);
 
 		var line_of_sight= true;
 		{
 			RaycastHit hit;
-			if (Physics.Linecast (transform.position, GameObject.Find ("Main Camera").transform.position, out hit, 1 << 0)) {
+			if (Physics.Linecast (transform.position, GameObject.Find ("Camera (head)").transform.position, out hit, 1 << 0)) {
 				line_of_sight = false;
 			}
 		}

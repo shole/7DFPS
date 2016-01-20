@@ -94,7 +94,7 @@ public class LevelCreatorScript : MonoBehaviour {
 
 
 	void  Update (){
-		var main_camera= GameObject.Find("Main Camera").transform;
+		var main_camera= GameObject.Find("Camera (head)").transform;
 		int tile_x =(int) (main_camera.position.z / 20.0f + 0.5f);
 		for(var i=-2; i <= 2; ++i){
 			CreateTileIfNeeded(tile_x+i);
